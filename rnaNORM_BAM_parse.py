@@ -79,8 +79,8 @@ class Input:
 				t = Transcript()
 				t.id = idt
 				t.length = int(ids[idt])
-				t.stops_modification = self.get_stops(arg.t, t.idt)
-				t.stops_control = self.get_stops(arg.c, t.idt)
+				t.stops_modification = self.get_stops(arg.t, t.id)
+				t.stops_control = self.get_stops(arg.c, t.id)
 				t.output()
 
 
