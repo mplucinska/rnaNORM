@@ -1,9 +1,7 @@
 import sys
 import math
-#import matplotlib.pyplot as plt
 from scipy import stats
 import numpy as np
-#import statsmodels.api as sm
 import argparse
 import pysam
 
@@ -53,7 +51,6 @@ class Transcript:
 					self.FC_pos.append(i)
 			except KeyError:
 				pass
-		#self.plot_scatter(self.stops_modification, self.stops_control, "_65_71_before_normalization")
 
 	def norm_kernel_densities(self):
 		density = stats.gaussian_kde(self.FC)
@@ -65,19 +62,12 @@ class Transcript:
 		f_o = open("maxy.txt", 'w')
 		f_o.write(str(max_y))
 		print max_y
-		#print self.norm_c
+		print self.norm_c
 		for i in range(0, self.length):
 			try:
 				self.stops_control_norm.append(self.stops_control[i] * self.norm_c)
 			except KeyError:
 				pass
-		#self.plot_scatter(self.stops_modification, self.stops_control_norm, "_65_71_normalized")
-		#plt.figure()
-		# plot histgram of sample
-		#plt.hist(self.FC, bins=20, normed=1)
-		# plot estimated density
-		#plt.legend()
-		#plt.show()
 
 	def plot_scatter(self, a, b, t):
 		plt.scatter(a, b)
@@ -112,7 +102,6 @@ class Transcript:
 					FC.append(0)
 			except KeyError:
 				FC.append(0)
-		#print FC
 		self.FC_lim = np.std(FC)
 
 		sort_react = sorted(self.reactivity)
@@ -123,7 +112,6 @@ class Transcript:
 		
 		file_out = open(arg.o, "w")
 
-		#print len(FC), len(self.reactivity)
 
 		for key in range(0, len(self.reactivity)):
 			if FC[key] >= self.FC_lim or (FC[key] == 0 and self.reactivity[key] > 0):
@@ -138,8 +126,6 @@ class Transcript:
 					self.reactivity[key] = up / c
 				else:
 					self.reactivity[key] = self.reactivity[key] / c
-
-			#print self.idt , key + 1, self.stops_modification[key], self.stops_control[key], self.stops_control_norm[key]  ,self.reactivity[key] , FC[key], FC_filtr[key] 
 			
 			out = "\t".join([self.idt , str(key + 1) , str(self.stops_modification[key]) ,  str(self.stops_control[key]) , str(self.stops_control_norm[key]) , str(self.reactivity[key]) , str(FC[key]) , str(FC_filtr[key])])
 			file_out.write(out + "\n")
@@ -152,8 +138,9 @@ class Transcript:
 			file_out.write(out + "\n")
 		f_o = open("maxy.txt", 'w')
 		f_o.write(str(0))
+
 class Input:
-	def get_stops(self, bam,idt): # counting stops for each position in transcript
+	def get_stops(self, bam, idt): # counting stops for each position in transcript
 		reads={}
 		samfile = pysam.AlignmentFile(bam, "rb")
 		iter = samfile.fetch(idt)
@@ -163,11 +150,8 @@ class Input:
 				if pos != 0:
 					if read.is_reverse:
 						pass
-					#if read.is_read1 and read.is_proper_pair:
 					else:
 						reads[read.reference_start] += 1
-					#else:
-					#	print read.is_read2
 			except KeyError:
 				reads[read.reference_start] = 1
 		for i in range(0, max(reads.keys())):
@@ -188,8 +172,8 @@ class Input:
 					line = i.split()
 					#print id_p, line[0]
 					if id_p == line[0]:
-						t.stops_modification.append(int(line[3]))
-						t.stops_control.append(int(line[2]))
+						t.stops_modification.append(float(line[3]))
+						t.stops_control.append(float(line[2]))
 						id_p = line[0]
 					elif start == True:
 						t.idt = id_p
@@ -207,8 +191,8 @@ class Input:
 					if start == False:
 						t = Transcript()
 						id_p = line[0]
-						t.stops_modification.append(int(line[3]))
-						t.stops_control.append(int(line[2]))
+						t.stops_modification.append(float(line[3]))
+						t.stops_control.append(float(line[2]))
 						start = True
 				try:
 					t.idt = id_p

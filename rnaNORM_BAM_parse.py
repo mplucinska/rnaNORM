@@ -69,11 +69,11 @@ class Input:
 			samfile = pysam.AlignmentFile(arg.c, "rb")
 			ids = {}
 			for i in samfile.header["SQ"]:
-				if not arg.id:
-					ids[i['SN']] = i['LN']
-				else:
-					if i['SN'] in arg.id.split(","):
-						ids[i['SN']] = i['LN']
+				#if not arg.id:
+				ids[i['SN']] = i['LN']
+				#else:
+				#	if i['SN'] in arg.id.split(","):
+				#		ids[i['SN']] = i['LN']
 			#for each transcript
 			for idt in ids.keys():
 				t = Transcript()
