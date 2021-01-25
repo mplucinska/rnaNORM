@@ -1,10 +1,6 @@
 
 import sys
 import math
-#import matplotlib.pyplot as plt
-#from scipy import stats
-#import numpy as np
-#import statsmodels.api as sm
 import argparse
 import pysam
 
@@ -35,7 +31,7 @@ class Transcript:
 	def output(self):
 
 		with open(arg.o, 'a') as out:
-			for i in (0, self.length):
+			for i in range(0, self.length):
 				out.write(self.id + "\t" + str(i + 1)+ "\t" + self.stops_control[i] + "\t" + self.stops_modification[i] + "\n")
 
 
@@ -81,8 +77,8 @@ class Input:
 			#for each transcript
 			for idt in ids.keys():
 				t = Transcript()
-				t.idt = idt
-				t.length = ids[idt]
+				t.id = idt
+				t.length = int(ids[idt])
 				t.stops_modification = self.get_stops(arg.t, t.idt)
 				t.stops_control = self.get_stops(arg.c, t.idt)
 				t.output()
