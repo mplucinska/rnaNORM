@@ -3,11 +3,12 @@ import sys
 import math
 import argparse
 import pysam
+import pandas
 
 
 class Arguments:
 	def __init__(self):
-		i = ""
+		ids = ""
 		c = ""
 		t = ""
 		o = ""
@@ -16,11 +17,16 @@ class Arguments:
 		parser = argparse.ArgumentParser()
 		parser.add_argument("-c", help = "bam file - treated sample", required = False, type = str)
 		parser.add_argument("-t", help = "bam file - control sample", required = False, type = str)
+		parser.add_argument("--ids", help = "bam file - control sample", required = False, type = str)
 		parser.add_argument("-o", help = "output file", required = True, type = str)
 		args = parser.parse_args()
 		self.c = args.c
 		self.t = args.t
 		self.o = args.o
+
+		if args.ids:
+			tr = pandas.read_table(args.ids, header = 0, names = ["tr_ids", "cover"])
+			self.ids = tr['tr_ids'].to_list()
 
 class Transcript:
 	def __init__(self):
@@ -32,7 +38,7 @@ class Transcript:
 
 		with open(arg.o, 'a') as out:
 			for i in range(0, self.length):
-				out.write(self.id + "\t" + str(i + 1)+ "\t" + str(self.stops_control[i]) + "\t" + str(self.stops_modification[i]) + "\n")
+				out.write(self.id + "\t" + str(i + 1)+ "\t" + self.stops_control[i] + "\t" + self.stops_modification[i] + "\n")
 
 
 class Input:
@@ -69,18 +75,18 @@ class Input:
 			samfile = pysam.AlignmentFile(arg.c, "rb")
 			ids = {}
 			for i in samfile.header["SQ"]:
-				#if not arg.id:
-				ids[i['SN']] = i['LN']
-				#else:
-				#	if i['SN'] in arg.id.split(","):
-				#		ids[i['SN']] = i['LN']
+				if not arg.ids:
+					ids[i['SN']] = i['LN']
+				else:
+					if i['SN'] in arg.ids:
+						ids[i['SN']] = i['LN']
 			#for each transcript
 			for idt in ids.keys():
 				t = Transcript()
 				t.id = idt
 				t.length = int(ids[idt])
-				t.stops_modification = self.get_stops(arg.t, t.id)
-				t.stops_control = self.get_stops(arg.c, t.id)
+				t.stops_modification = self.get_stops(arg.t, t.idt)
+				t.stops_control = self.get_stops(arg.c, t.idt)
 				t.output()
 
 
