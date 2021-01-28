@@ -37,10 +37,12 @@ class Transcript:
 	def output(self):
 
 		with open(arg.o, 'a') as out:
-			for i in range(0, self.length):
-				out.write(self.id + "\t" + str(i + 1)+ "\t" + self.stops_control[i] + "\t" + self.stops_modification[i] + "\n")
-
-
+			for i in range(0, self.length - 1):
+				try:
+					out.write(self.id + "\t" + str(i + 1)+ "\t" + self.stops_control[i] + "\t" + self.stops_modification[i] + "\n")
+				except KeyError:
+					out.write(self.id + "\t" + str(i + 1)+ "\t" + str(0) + "\t" + str(0) + "\n")
+					
 class Input:
 	def get_stops(self, bam,idt): # counting stops for each position in transcript
 		reads={}
